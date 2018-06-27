@@ -20,7 +20,9 @@ export function addToCart(markers, { options, callbacks, map, useObjectManager, 
         const clusterOptions = options[clusterName] || {};
         const clusterCallbacks = callbacks[clusterName] || {};
         const layout = clusterOptions.layout;
-        clusterOptions.clusterBalloonItemContentLayout = ymaps.templateLayoutFactory.createClass(layout);
+        if (layout) {
+           clusterOptions.clusterBalloonItemContentLayout = ymaps.templateLayoutFactory.createClass(layout);
+        }
         if (useObjectManager) {
             const ObjectManager = new ymaps.ObjectManager(Object.assign({ clusterize: objectManagerClusterize }, clusterOptions));
             for (let key in clusterCallbacks) {
