@@ -6,7 +6,8 @@ export default {
             ymapEventBus: utils.emitter,
             ymapId: 'yandexMap' + Math.round(Math.random() * 100000),
             myMap: {},
-            style: this.ymapClass ? '' : 'width: 100%; height: 100%;'
+            style: this.ymapClass ? '' : 'width: 100%; height: 100%;',
+            markers: []
         }
     },
     props: {
@@ -93,111 +94,8 @@ export default {
             if (!window.ymaps || !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return; 
             
             this.$emit('map-initialization-started');
-            let markers = [];
 
-            const myMarkers = this.$slots.default && this.$slots.default.map(m => {
-                const props = m.componentOptions && m.componentOptions.propsData;
-                if (!props) return;
-                let balloonOptions = {};
-
-                if (props.balloonTemplate) {
-                    const BalloonContentLayoutClass = ymaps.templateLayoutFactory.createClass(props.balloonTemplate);
-                    balloonOptions = { balloonContentLayout: BalloonContentLayoutClass }
-                }
-
-                let marker = {
-                    markerId: props.markerId,
-                    markerType: props.markerType,
-                    coords: utils.setCoordsToNumeric(props.coords),
-                    hintContent: props.hintContent,
-                    markerFill: props.markerFill,
-                    circleRadius: +props.circleRadius,
-                    clusterName: props.clusterName,
-                    markerStroke: props.markerStroke,
-                    balloon: props.balloon,
-                    callbacks: props.callbacks,
-                    properties: props.properties,
-                    options: props.options,
-                    balloonOptions
-                };
-
-                if (props.icon && props.icon.layout === 'default#image') {
-                    marker.iconLayout = props.icon.layout;
-                    marker.iconImageHref = props.icon.imageHref;
-                    marker.iconImageSize = props.icon.imageSize;
-                    marker.iconImageOffset = props.icon.imageOffset;
-                } else {
-                    marker.icon = props.icon;
-                }
-
-                return marker;
-            }).filter(marker => marker && marker.markerType) || [];
-            
-            for (let i = 0; i < myMarkers.length; i++) {
-                const m = myMarkers[i];
-                const markerType = utils.createMarkerType(m.markerType, this.useObjectManager);
-                const initialProps = {
-                    hintContent: m.hintContent,
-                    iconContent: m.icon && m.icon.content,
-                    markerId: m.markerId
-                };
-
-                const balloonProps = m.balloon ? {
-                    balloonContentHeader: m.balloon.header,
-                    balloonContent: m.balloon.body,
-                    balloonContentBody: m.balloon.body,
-                    balloonContentFooter: m.balloon.footer,
-                } : {};
-
-                const properties = Object.assign(initialProps, balloonProps, m.properties);
-
-                const iconOptions = m.iconLayout ? {
-                    iconLayout: m.iconLayout,
-                    iconImageHref: m.iconImageHref,
-                    iconImageSize: m.iconImageSize,
-                    iconImageOffset: m.iconImageOffset
-                } : { preset: m.icon && `islands#${utils.getIconPreset(m)}Icon` };                
-
-                const strokeOptions = m.markerStroke ? {
-                    strokeColor: m.markerStroke.color || "0066ffff",
-                    strokeOpacity: parseFloat(m.markerStroke.opacity) >= 0 ? parseFloat(m.markerStroke.opacity) : 1,
-                    strokeStyle: m.markerStroke.style,
-                    strokeWidth: parseFloat(m.markerStroke.width) >= 0 ? parseFloat(m.markerStroke.width) : 1
-                } : {};
-
-                const fillOptions = m.markerFill ? {
-                    fill: m.markerFill.enabled || true,
-                    fillColor: m.markerFill.color || "0066ff99",
-                    fillOpacity: parseFloat(m.markerFill.opacity) >= 0 ? parseFloat(m.markerFill.opacity) : 1,
-                    fillImageHref: m.markerFill.imageHref || ''
-                } : {};
-
-                const options = Object.assign(iconOptions, strokeOptions, fillOptions, m.balloonOptions, m.options);
-
-                if (markerType === 'Circle') {
-                    m.coords = [m.coords, m.circleRadius];
-                }
-
-                const obj = { properties, options, markerType, coords: m.coords, clusterName: m.clusterName, callbacks: m.callbacks }
-                const marker = utils.createMarker(obj, this.useObjectManager);
-
-                markers.push(marker);
-            }
-
-            if (this.placemarks) {
-                const markerType = this.useObjectManager ? 'Point' : 'Placemark';
-                this.placemarks.forEach(placemark => {
-                    const { properties, options = {}, coords, clusterName, callbacks, balloonTemplate } = placemark;
-                    if (balloonTemplate) {
-                        const BalloonContentLayoutClass = ymaps.templateLayoutFactory.createClass(balloonTemplate);
-                        options.balloonContentLayout = BalloonContentLayoutClass;
-                    }
-                    const obj = { properties, options, markerType, coords, clusterName, callbacks }
-                    let yplacemark = utils.createMarker(obj, this.useObjectManager);
-                    
-                    markers.push(yplacemark);
-                })
-            }
+            this.generatePlacemarks();
 
             this.myMap = new ymaps.Map(this.ymapId, {
                 center: this.coordinates,
@@ -228,8 +126,118 @@ export default {
                 useObjectManager: this.useObjectManager,
                 objectManagerClusterize: this.objectManagerClusterize
             };
-            utils.addToCart(markers, config);
+            utils.addToCart(this.markers, config);
             this.$emit('map-was-initialized', this.myMap);
+        },
+        generatePlacemarks() {
+          // if ymap isn't initialized or have no markers;
+          if (!window.ymaps || !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return;
+
+          this.markers = []
+
+          const myMarkers = this.$slots.default && this.$slots.default.map(m => {
+            const props = m.componentOptions && m.componentOptions.propsData;
+            if (!props) return;
+            let balloonOptions = {};
+
+            if (props.balloonTemplate) {
+              const BalloonContentLayoutClass = ymaps.templateLayoutFactory.createClass(props.balloonTemplate);
+              balloonOptions = { balloonContentLayout: BalloonContentLayoutClass }
+            }
+
+            let marker = {
+              markerId: props.markerId,
+              markerType: props.markerType,
+              coords: utils.setCoordsToNumeric(props.coords),
+              hintContent: props.hintContent,
+              markerFill: props.markerFill,
+              circleRadius: +props.circleRadius,
+              clusterName: props.clusterName,
+              markerStroke: props.markerStroke,
+              balloon: props.balloon,
+              callbacks: props.callbacks,
+              properties: props.properties,
+              options: props.options,
+              balloonOptions
+            };
+
+            if (props.icon && props.icon.layout === 'default#image') {
+              marker.iconLayout = props.icon.layout;
+              marker.iconImageHref = props.icon.imageHref;
+              marker.iconImageSize = props.icon.imageSize;
+              marker.iconImageOffset = props.icon.imageOffset;
+            } else {
+              marker.icon = props.icon;
+            }
+
+            return marker;
+          }).filter(marker => marker && marker.markerType) || [];
+
+          for (let i = 0; i < myMarkers.length; i++) {
+            const m = myMarkers[i];
+            const markerType = utils.createMarkerType(m.markerType, this.useObjectManager);
+            const initialProps = {
+              hintContent: m.hintContent,
+              iconContent: m.icon && m.icon.content,
+              markerId: m.markerId
+            };
+
+            const balloonProps = m.balloon ? {
+              balloonContentHeader: m.balloon.header,
+              balloonContent: m.balloon.body,
+              balloonContentBody: m.balloon.body,
+              balloonContentFooter: m.balloon.footer,
+            } : {};
+
+            const properties = Object.assign(initialProps, balloonProps, m.properties);
+
+            const iconOptions = m.iconLayout ? {
+              iconLayout: m.iconLayout,
+              iconImageHref: m.iconImageHref,
+              iconImageSize: m.iconImageSize,
+              iconImageOffset: m.iconImageOffset
+            } : { preset: m.icon && `islands#${utils.getIconPreset(m)}Icon` };
+
+            const strokeOptions = m.markerStroke ? {
+              strokeColor: m.markerStroke.color || "0066ffff",
+              strokeOpacity: parseFloat(m.markerStroke.opacity) >= 0 ? parseFloat(m.markerStroke.opacity) : 1,
+              strokeStyle: m.markerStroke.style,
+              strokeWidth: parseFloat(m.markerStroke.width) >= 0 ? parseFloat(m.markerStroke.width) : 1
+            } : {};
+
+            const fillOptions = m.markerFill ? {
+              fill: m.markerFill.enabled || true,
+              fillColor: m.markerFill.color || "0066ff99",
+              fillOpacity: parseFloat(m.markerFill.opacity) >= 0 ? parseFloat(m.markerFill.opacity) : 1,
+              fillImageHref: m.markerFill.imageHref || ''
+            } : {};
+
+            const options = Object.assign(iconOptions, strokeOptions, fillOptions, m.balloonOptions, m.options);
+
+            if (markerType === 'Circle') {
+              m.coords = [m.coords, m.circleRadius];
+            }
+
+            const obj = { properties, options, markerType, coords: m.coords, clusterName: m.clusterName, callbacks: m.callbacks }
+            const marker = utils.createMarker(obj, this.useObjectManager);
+
+            this.markers.push(marker);
+          }
+
+          if (this.placemarks) {
+            const markerType = this.useObjectManager ? 'Point' : 'Placemark';
+            this.placemarks.forEach(placemark => {
+              const { properties, options = {}, coords, clusterName, callbacks, balloonTemplate } = placemark;
+              if (balloonTemplate) {
+                const BalloonContentLayoutClass = ymaps.templateLayoutFactory.createClass(balloonTemplate);
+                options.balloonContentLayout = BalloonContentLayoutClass;
+              }
+              const obj = { properties, options, markerType, coords, clusterName, callbacks }
+              let yplacemark = utils.createMarker(obj, this.useObjectManager);
+
+              this.markers.push(yplacemark);
+            })
+          }
         }
     },
     watch: {
@@ -238,9 +246,20 @@ export default {
         },
         placemarks() {
             if (window.ymaps) {
-                console.log('destroy');
-                this.myMap.destroy && this.myMap.destroy();
-                this.init();
+                // this.myMap.destroy && this.myMap.destroy();
+                // this.init();
+              this.generatePlacemarks()
+
+              const config = {
+                options: this.clusterOptions,
+                callbacks: this.clusterCallbacks,
+                map: this.myMap,
+                useObjectManager: this.useObjectManager,
+                objectManagerClusterize: this.objectManagerClusterize
+              };
+
+              this.myMap.geoObjects.removeAll();
+              utils.addToCart(this.markers, config);
             }
         },
         zoom() {
