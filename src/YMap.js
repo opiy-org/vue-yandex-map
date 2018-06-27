@@ -144,6 +144,7 @@ export default {
 
                 const balloonProps = m.balloon ? {
                     balloonContentHeader: m.balloon.header,
+                    balloonContent: m.balloon.body,
                     balloonContentBody: m.balloon.body,
                     balloonContentFooter: m.balloon.footer,
                 } : {};
@@ -237,6 +238,7 @@ export default {
         },
         placemarks() {
             if (window.ymaps) {
+                console.log('destroy');
                 this.myMap.destroy && this.myMap.destroy();
                 this.init();
             }
