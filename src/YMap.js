@@ -258,7 +258,9 @@ export default {
                 objectManagerClusterize: this.objectManagerClusterize
               };
 
-              this.myMap.geoObjects.removeAll();
+              if (window.ymaps && this.myMap && this.myMap.geoObjects) {
+                this.myMap.geoObjects.removeAll();
+              }
               utils.addToCart(this.markers, config);
             }
         },
