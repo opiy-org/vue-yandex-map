@@ -2,6 +2,9 @@
 
 vue-yandex-maps is a plugin for vue.js that adds yandex-map custom element.
 
++ reduce rerender attempts
+
+
 # Install
 
 ```Bash
