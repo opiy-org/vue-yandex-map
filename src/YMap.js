@@ -245,7 +245,7 @@ export default {
             this.myMap.setCenter && this.myMap.setCenter(newVal, this.zoom)
         },
         placemarks() {
-            if (window.ymaps) {
+            if (!window.ymaps || !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return;
                 // this.myMap.destroy && this.myMap.destroy();
                 // this.init();
               this.generatePlacemarks()
@@ -262,7 +262,6 @@ export default {
                 this.myMap.geoObjects.removeAll();
               }
               utils.addToCart(this.markers, config);
-            }
         },
         zoom() {
             this.myMap.setZoom(this.zoom);
