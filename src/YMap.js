@@ -242,7 +242,7 @@ export default {
     },
     watch: {
         coordinates(newVal) {
-            this.myMap.setCenter && this.myMap.setCenter(newVal, this.zoom)
+            this.myMap.panTo && this.myMap.panTo(newVal)
         },
         placemarks() {
             if (!ymaps ||  !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return;
