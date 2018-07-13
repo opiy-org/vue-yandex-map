@@ -16,7 +16,7 @@
     "yandex-maps",
     "vue"
   ],
-  "author": "bizz.gc@gmail.com",
+  "author": "alexv14v@yandex.ru",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.0",
