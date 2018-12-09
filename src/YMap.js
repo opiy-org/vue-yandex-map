@@ -265,7 +265,11 @@ export default {
 
         },
         zoom() {
+          try {
             this.myMap.setZoom(this.zoom);
+          } catch (e) {
+            console.log( + e.name + ":" + e.message + "\n" + e.stack);
+          }
         }
     },
     render(h) {
