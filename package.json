@@ -1,6 +1,6 @@
 {
   "name": "dron-vue-yandex-maps",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Yandex Maps component for VueJS.",
   "main": "vue-yandex-maps.js",
   "jsnext:main": "./src/index.js",
@@ -24,9 +24,9 @@
     "babel-preset-env": "^1.6.1",
     "rollup": "^0.53.3",
     "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-uglify": "^2.0.1",
     "rollup-plugin-vue": "^3.0.0",
-    "vue": "^2.3"
+    "vue": "^2.5.18"
   }
 }

@@ -245,10 +245,13 @@ export default {
             this.myMap.panTo && this.myMap.panTo(newVal)
         },
         placemarks() {
-            if (!ymaps ||  !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return;
-                // this.myMap.destroy && this.myMap.destroy();
-                // this.init();
+          if (this.ymapEventBus.ymapReady) {
+            this.generatePlacemarks()
+          } else {
+            this.ymapEventBus.$on('scriptIsLoaded', () => {
               this.generatePlacemarks()
+            })
+          }
 
               const config = {
                 options: this.clusterOptions,
@@ -268,7 +271,7 @@ export default {
           try {
             this.myMap.setZoom(this.zoom);
           } catch (e) {
-            console.log( + e.name + ":" + e.message + "\n" + e.stack);
+            console.log( e.name + ":" + e.message + "\n" + e.stack);
           }
         }
     },
