@@ -322,8 +322,8 @@ export default {
 
         if (this.ymapEventBus.scriptIsNotAttached) {
             const yandexMapScript = document.createElement('SCRIPT');
-            const apiKeyData = this.apiKey ? 'apiKey=' + this.apiKey + '&' : '';
-            const mapLink = this.mapLink || `https://api-maps.yandex.ru/2.1/?${apiKeyData}lang=ru_RU`;
+            const apiKeyData = this.apiKey ? '&apiKey=' + this.apiKey : '';
+            const mapLink = this.mapLink || `https://api-maps.yandex.ru/2.1/?lang=ru_RU${apiKeyData}`;
             yandexMapScript.setAttribute('src', mapLink);
             yandexMapScript.setAttribute('async', '');
             yandexMapScript.setAttribute('defer', '');
