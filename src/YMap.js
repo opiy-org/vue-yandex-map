@@ -11,6 +11,10 @@ export default {
         }
     },
     props: {
+        apiKey: {
+            type: String | null,
+            default: null,
+        },
         coords: {
             type: Array,
             validator(val) {
@@ -91,8 +95,8 @@ export default {
     methods: {
         init() {
             // if ymap isn't initialized or have no markers;
-            if (!window.ymaps || !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return; 
-            
+            if (!window.ymaps || !ymaps.GeoObjectCollection || (!this.initWithoutMarkers && !this.$slots.default && !this.placemarks.length)) return;
+
             this.$emit('map-initialization-started');
 
             this.generatePlacemarks();
@@ -277,11 +281,11 @@ export default {
     },
     render(h) {
         return h(
-            'section', 
+            'section',
             { class: 'ymap-container' },
             [
                 h(
-                    'div', 
+                    'div',
                     {
                         attrs: {
                             id: this.ymapId,
@@ -300,7 +304,7 @@ export default {
                     [
                         this.$slots.default
                     ]
-                ) 
+                )
             ]
         )
     },
@@ -309,7 +313,7 @@ export default {
             this.myMap.destroy && this.myMap.destroy();
             this.init();
         }.bind(this));
-        
+
         // Setup the observer
         this.observer.observe(
             document.querySelector('.ymap-markers'),
@@ -318,7 +322,8 @@ export default {
 
         if (this.ymapEventBus.scriptIsNotAttached) {
             const yandexMapScript = document.createElement('SCRIPT');
-            const mapLink = this.mapLink || 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+            const apiKeyData = this.apiKey ? 'apiKey=' + this.apiKey + '&' : '';
+            const mapLink = this.mapLink || `https://api-maps.yandex.ru/2.1/?${apiKeyData}lang=ru_RU`;
             yandexMapScript.setAttribute('src', mapLink);
             yandexMapScript.setAttribute('async', '');
             yandexMapScript.setAttribute('defer', '');

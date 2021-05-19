@@ -1,6 +1,6 @@
 {
   "name": "dron-vue-yandex-maps",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Yandex Maps component for VueJS.",
   "main": "vue-yandex-maps.js",
   "jsnext:main": "./src/index.js",
